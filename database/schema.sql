@@ -1,0 +1,45 @@
+CREATE DATABASE IF NOT EXISTS dayfit
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_general_ci;
+
+CREATE USER 'dayfit'@'localhost'
+  IDENTIFIED BY 'dayfit123#';
+
+GRANT ALL PRIVILEGES ON dayfit.* TO 'dayfit'@'localhost';
+FLUSH PRIVILEGES;
+
+USE dayfit;
+
+-- users
+CREATE TABLE users (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(255) UNIQUE,
+  password_hash VARCHAR(255),
+  apple_sub VARCHAR(255) UNIQUE,
+  provider ENUM('email','apple') NOT NULL,
+  email_verified TINYINT(1) DEFAULT 0,
+  nickname VARCHAR(50) NOT NULL,
+  birthday DATE DEFAULT NULL,
+  phone VARCHAR(20) DEFAULT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- email verification
+CREATE TABLE email_verifications (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(255) NOT NULL,
+  code VARCHAR(10) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  verified_at DATETIME DEFAULT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- access tokens (JWT 관리용 로그)
+CREATE TABLE access_tokens (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  token TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

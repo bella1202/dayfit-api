@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: Dayfit API
+  version: 1.0.0
+
+servers:
+  - url: http://dayfit.api.local
+
+paths:
+  /v1/auth/email/check:
+    post:
+      summary: Email duplicate check
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required: [email]
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  exists:
+                    type: boolean
+
+  /v1/weather/today:
+    get:
+      summary: Today weather by location
+      parameters:
+        - in: query
+          name: lat
+          required: true
+          schema: { type: number }
+        - in: query
+          name: lng
+          required: true
+          schema: { type: number }
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  temperature:
+                    type: number
+                  condition:
+                    type: string
+                  advice:
+                    type: string

@@ -1,0 +1,23 @@
+.env
+
+# runtime/data
+data/*.sqlite
+data/*.db
+data/*.log
+data/*.json
+data/*.txt
+
+# php
+/vendor/
+
+# mac
+.DS_Store
+
+# ide
+.idea/
+.vscode/
+.history/
+
+# tmp
+*.tmp
+*.log
