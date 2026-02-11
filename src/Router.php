@@ -10,6 +10,38 @@ class Router {
         $this->routes['POST'][$path] = $handler;
     }
 
+    public function put($path, $handler) {
+        $this->routes['PUT'][$path] = $handler;
+    }
+
+    public function delete($path, $handler) {
+        $this->routes['DELETE'][$path] = $handler;
+    }
+
+    private function resolveMethod(): string {
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+        // 일부 환경에서 PUT/DELETE가 막히거나 폼 전송에서 오버라이드 할 때 대비
+        // 1) Header override
+        $override = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ?? '';
+        if ($override) {
+            $override = strtoupper(trim($override));
+            if (in_array($override, ['PUT', 'DELETE'], true)) {
+                return $override;
+            }
+        }
+
+        // 2) Query override (?_method=PUT)
+        if ($method === 'POST' && isset($_GET['_method'])) {
+            $m = strtoupper(trim((string)$_GET['_method']));
+            if (in_array($m, ['PUT', 'DELETE'], true)) {
+                return $m;
+            }
+        }
+
+        return strtoupper($method);
+    }
+
     public function run() {
         $method = $_SERVER['REQUEST_METHOD'];
         $uri = strtok($_SERVER['REQUEST_URI'], '?');

@@ -43,3 +43,27 @@ CREATE TABLE access_tokens (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   INDEX (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- user locations 유저 위치(설정, 최근검색)
+CREATE TABLE user_locations (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+
+  title VARCHAR(60) NOT NULL,
+  subtitle VARCHAR(255) NOT NULL,
+
+  lat DECIMAL(10,7) NOT NULL,
+  lon DECIMAL(10,7) NOT NULL,
+
+  place_key CHAR(40) NOT NULL,     -- sha1 같은 고정 길이
+  is_primary TINYINT(1) NOT NULL DEFAULT 0,
+
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+
+  UNIQUE KEY uk_user_place (user_id, place_key),
+  INDEX idx_user_updated (user_id, updated_at),
+  INDEX idx_user_primary (user_id, is_primary)
+);
