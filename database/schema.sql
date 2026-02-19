@@ -66,4 +66,15 @@ CREATE TABLE user_locations (
   UNIQUE KEY uk_user_place (user_id, place_key),
   INDEX idx_user_updated (user_id, updated_at),
   INDEX idx_user_primary (user_id, is_primary)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- users history 로그인 히스토리 내역
+CREATE TABLE users_history (
+	id BIGINT auto_increment NOT NULL,
+	user_id BIGINT NOT NULL,
+	ip varchar(25) NULL,
+	device TEXT NULL,
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP  NOT NULL,
+	CONSTRAINT users_history_pk PRIMARY KEY (id),
+	CONSTRAINT users_history_users_FK FOREIGN KEY (user_id) REFERENCES users(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

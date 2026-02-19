@@ -14,6 +14,15 @@ class AuthService {
             ':token'   => $token,
             ':expires_at' => $expiresAt
         ]);
+
+        Db::$pdo->prepare("
+            INSERT INTO users_history (user_id, ip, device)
+            VALUES (:user_id, :ip, :device)
+        ")->execute([
+            ':user_id' => $userId,
+            ':ip'   => $_SERVER['REMOTE_ADDR'],
+            ':device' => $_SERVER['HTTP_USER_AGENT']
+        ]);
     
         return $token;
     }    
