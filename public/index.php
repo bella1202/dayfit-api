@@ -73,6 +73,7 @@ $router->get('/v1/ping', function () {
 });
 
 // ---- Auth
+$router->get('/v1/me', 'AuthService@me');
 $router->post('/v1/auth/email/check', 'AuthService@checkEmail');
 $router->post('/v1/auth/email/request', 'AuthService@requestEmailVerify');
 $router->post('/v1/auth/email/verify', 'AuthService@verifyEmail');

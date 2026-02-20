@@ -1,6 +1,35 @@
 <?php
 
 class AuthService {
+    private function getUserIdFromToken(): int {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    
+        if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+            Json::error(401, 'UNAUTHORIZED', 'Missing token');
+        }
+    
+        $token = $matches[1];
+    
+        $stmt = Db::$pdo->prepare("
+            SELECT user_id
+            FROM access_tokens
+            WHERE token = :token
+              AND expires_at > NOW()
+            LIMIT 1
+        ");
+        $stmt->execute([
+            ':token' => $token
+        ]);
+    
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if (!$row) {
+            Json::error(401, 'INVALID_TOKEN', 'Token is invalid or expired');
+        }
+    
+        return (int)$row['user_id'];
+    }
+
     private function issueToken(int $userId): string {
         $token = base64_encode(random_bytes(40));
         // $expiresAt = date('Y-m-d H:i:s', time() + 60 * 60 * 24); // 1일
@@ -26,6 +55,28 @@ class AuthService {
     
         return $token;
     }    
+
+    public function me() {
+        $userId = $this->getUserIdFromToken();
+    
+        $stmt = Db::$pdo->prepare("
+            SELECT id, email, nickname, birthday, phone, provider
+            FROM users
+            WHERE id = :id
+            LIMIT 1
+        ");
+        $stmt->execute([
+            ':id' => $userId
+        ]);
+    
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if (!$user) {
+            Json::error(404, 'USER_NOT_FOUND');
+        }
+    
+        Json::ok($user);
+    }
 
     public function checkEmail() {
         $b = Json::body();
